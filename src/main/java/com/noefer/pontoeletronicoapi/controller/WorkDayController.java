@@ -1,6 +1,5 @@
 package com.noefer.pontoeletronicoapi.controller;
 
-import com.noefer.pontoeletronicoapi.model.WorkDay;
 import com.noefer.pontoeletronicoapi.model.dto.WorkDayRequest;
 import com.noefer.pontoeletronicoapi.model.dto.WorkDayResponse;
 import com.noefer.pontoeletronicoapi.service.WorkDayService;
@@ -23,8 +22,8 @@ public class WorkDayController {
         return ResponseEntity.ok(service.register(request));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<List<WorkDay>> findAllByWorkDay(@PathVariable Long id) {
-        return ResponseEntity.ok(service.findAllByWorkDay(id));
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<WorkDayResponse>> findAllByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(service.findAllByUserId(userId));
     }
 }

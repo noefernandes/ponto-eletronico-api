@@ -8,8 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -20,28 +20,21 @@ import java.util.List;
 public class WorkDay {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "work_day_seq")
+    @SequenceGenerator(name = "work_day_seq", sequenceName = "work_day_seq", allocationSize = 1)
     private Long id;
 
     @Column(nullable = false)
     @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="dd-MM-yyyy HH:mm:ss", timezone = "GMT-3")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
+    private LocalDateTime timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private UserProfile user;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "workDay", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TimeRecord> timeRecords = new ArrayList<>();
 
     public WorkDay(WorkDayRequest request) {
-        this.date = request.getDate();
-        request.getTimeRecords().forEach(
-                timeRecord -> {
-                    TimeRecord record = new TimeRecord(timeRecord);
-                    record.setWorkDay(this);
-                    timeRecords.add(record);
-                }
-        );
+        this.timestamp = request.getTimestamp();
     }
 }

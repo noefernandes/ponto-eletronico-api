@@ -8,8 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Time;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -18,13 +17,13 @@ import java.util.Date;
 @AllArgsConstructor
 public class TimeRecord {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "time_record_seq")
+    @SequenceGenerator(name = "time_record_seq", sequenceName = "time_record_seq", allocationSize = 1)
     private Long id;
 
     @Column(nullable = false)
     @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="dd-MM-yyyy HH:mm:ss", timezone = "GMT-3")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
+    private LocalDateTime timestamp;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -34,7 +33,7 @@ public class TimeRecord {
     private WorkDay workDay;
 
     public TimeRecord(TimeRecordRequest request) {
-        this.date = request.getDate();
+        this.timestamp = request.getTimestamp();
         this.type = request.getType();
     }
 }

@@ -46,7 +46,7 @@ public class UserProfileService {
         return repository.findAll();
     }
 
-    public UserProfile findByIdUser(Long id) {
+    public UserProfile findUserById(Long id) {
         return repository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     }
     

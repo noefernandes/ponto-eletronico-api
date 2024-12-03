@@ -17,7 +17,8 @@ import java.util.List;
 @AllArgsConstructor
 public class UserProfile {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_profile_seq")
+    @SequenceGenerator(name = "user_profile_seq", sequenceName = "user_profile_seq", allocationSize = 1)
     private Long id;
 
     @Column(nullable = false)
@@ -33,7 +34,11 @@ public class UserProfile {
     @Column(nullable = false)
     private Role role;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private WorkLoad workLoad;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkDay> workDays = new ArrayList<>();
 
     public UserProfile(UserProfileRequest request) {
@@ -41,5 +46,6 @@ public class UserProfile {
         this.username = request.getUsername();
         this.password = request.getPassword();
         this.role = request.getRole();
+        this.workLoad = request.getWorkLoad();
     }
 }

@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -17,12 +17,12 @@ import java.util.List;
 public class WorkDayResponse {
     private Long id;
     @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="dd-MM-yyyy HH:mm:ss", timezone = "GMT-3")
-    private Date date;
+    private LocalDateTime timestamp;
     private List<TimeRecordResponse> timeRecords;
 
     public WorkDayResponse(WorkDay workDay) {
         this.id = workDay.getId();
-        this.date = workDay.getDate();
+        this.timestamp = workDay.getTimestamp();
         this.timeRecords = workDay.getTimeRecords().stream().map(TimeRecordResponse::new).toList();
     }
 }

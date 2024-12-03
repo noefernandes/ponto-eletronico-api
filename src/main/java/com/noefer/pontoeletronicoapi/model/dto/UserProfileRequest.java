@@ -1,6 +1,7 @@
 package com.noefer.pontoeletronicoapi.model.dto;
 
 import com.noefer.pontoeletronicoapi.model.Role;
+import com.noefer.pontoeletronicoapi.model.WorkLoad;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,4 +16,5 @@ public class UserProfileRequest {
     private String username;
     private String password;
     private Role role;
+    private WorkLoad workLoad;
 }
