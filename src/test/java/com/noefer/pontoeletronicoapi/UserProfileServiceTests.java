@@ -14,7 +14,7 @@ import java.util.List;
 
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest
-class PontoEletronicoApiApplicationTests {
+class UserProfileServiceTests {
 
     @Autowired
     private UserProfileService service;

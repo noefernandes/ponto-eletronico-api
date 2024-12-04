@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -49,19 +50,25 @@ public class WorkDayService {
         return workDayOp.get();
     }
 
-    public WorkDayResponse findWorkDayResponse(Long id) {
+    public WorkDayReport findWorkDayResponse(Long id) {
         Optional<WorkDay> workDayOp = repository.findById(id);
         if(workDayOp.isEmpty()) {
             throw new RuntimeException("WorkDay not found");
         }
 
+        Duration targetWorkDuration;
         WorkDay workDay = workDayOp.get();
-        Duration targetWorkDuration = Duration.ofHours(workDay.getUser().getWorkLoad().getHours());
+
+        if (Objects.requireNonNull(workDay.getUser().getWorkLoad()) == WorkLoad.TESTWORKLOAD) {
+            targetWorkDuration = Duration.ofSeconds(30);
+        } else {
+            targetWorkDuration = Duration.ofHours(workDay.getUser().getWorkLoad().getHours());
+        }
 
         return generateWorkDayReport(workDay, targetWorkDuration);
     }
 
-    public WorkDayResponse generateWorkDayReport(WorkDay workDay, Duration targetWorkDuration) {
+    public WorkDayReport generateWorkDayReport(WorkDay workDay, Duration targetWorkDuration) {
         List<TimeRecord> timeRecords = workDay.getTimeRecords();
 
         timeRecords.sort(Comparator.comparing(TimeRecord::getTimestamp));
