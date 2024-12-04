@@ -26,4 +26,9 @@ public class WorkDayController {
     public ResponseEntity<List<WorkDayResponse>> findAllByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(service.findAllByUserId(userId));
     }
+
+    @GetMapping("/{id}/report")
+    public ResponseEntity<WorkDayResponse> getWorkDayReport(@PathVariable Long id) {
+        return ResponseEntity.ok(service.findWorkDayResponse(id));
+    }
 }

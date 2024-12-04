@@ -1,15 +1,18 @@
 package com.noefer.pontoeletronicoapi.service;
 
-import com.noefer.pontoeletronicoapi.model.UserProfile;
-import com.noefer.pontoeletronicoapi.model.WorkDay;
-import com.noefer.pontoeletronicoapi.model.dto.WorkDayInfo;
+import com.noefer.pontoeletronicoapi.model.*;
+import com.noefer.pontoeletronicoapi.model.dto.WorkDayReport;
 import com.noefer.pontoeletronicoapi.model.dto.WorkDayRequest;
 import com.noefer.pontoeletronicoapi.model.dto.WorkDayResponse;
 import com.noefer.pontoeletronicoapi.repository.WorkDayRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class WorkDayService {
@@ -38,12 +41,57 @@ public class WorkDayService {
     }
 
     public WorkDay findWorkDay(Long id) {
-        return repository.findById(id).orElseThrow(() -> new RuntimeException("WorkDay not found"));
+        Optional<WorkDay> workDayOp = repository.findById(id);
+        if(workDayOp.isEmpty()) {
+            throw new RuntimeException("WorkDay not found");
+        }
+
+        return workDayOp.get();
     }
 
-    public WorkDayInfo getWorkDayInfo(Long id) {
-        WorkDay workDay = findWorkDay(id);
+    public WorkDayResponse findWorkDayResponse(Long id) {
+        Optional<WorkDay> workDayOp = repository.findById(id);
+        if(workDayOp.isEmpty()) {
+            throw new RuntimeException("WorkDay not found");
+        }
 
-        return null;
+        WorkDay workDay = workDayOp.get();
+        Duration targetWorkDuration = Duration.ofHours(workDay.getUser().getWorkLoad().getHours());
+
+        return generateWorkDayReport(workDay, targetWorkDuration);
+    }
+
+    public WorkDayResponse generateWorkDayReport(WorkDay workDay, Duration targetWorkDuration) {
+        List<TimeRecord> timeRecords = workDay.getTimeRecords();
+
+        timeRecords.sort(Comparator.comparing(TimeRecord::getTimestamp));
+
+        LocalDateTime start = null;
+        Duration totalWorkTime = Duration.ZERO;
+
+        for (TimeRecord timeRecord : timeRecords) {
+            if (timeRecord.getType() == TimeRecordType.CHECKIN || timeRecord.getType() == TimeRecordType.RESUME) {
+                start = timeRecord.getTimestamp();
+            } else if ((timeRecord.getType() == TimeRecordType.BREAK || timeRecord.getType() == TimeRecordType.CHECKOUT) && start != null) {
+                totalWorkTime = totalWorkTime.plus(Duration.between(start, timeRecord.getTimestamp()));
+                start = null;
+            }
+        }
+
+        return getWorkDayResponse(workDay, targetWorkDuration, totalWorkTime);
+    }
+
+    private static WorkDayReport getWorkDayResponse(WorkDay workDay, Duration targetWorkDuration, Duration totalWorkTime) {
+        long totalWorkSeconds = totalWorkTime.getSeconds();
+        long targetWorkSeconds = targetWorkDuration.getSeconds();
+
+        long remainingSeconds = Math.max(0, targetWorkSeconds - totalWorkSeconds);
+        long extraSeconds = Math.max(0, totalWorkSeconds - targetWorkSeconds);
+
+        WorkDayReport workDayReport = new WorkDayReport(workDay);
+        workDayReport.setWorkedTime(totalWorkSeconds);
+        workDayReport.setRemainingTime(remainingSeconds);
+        workDayReport.setExceededTime(extraSeconds);
+        return workDayReport;
     }
 }
