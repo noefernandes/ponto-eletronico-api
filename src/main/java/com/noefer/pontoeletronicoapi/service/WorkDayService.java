@@ -1,5 +1,7 @@
 package com.noefer.pontoeletronicoapi.service;
 
+import com.noefer.pontoeletronicoapi.exception.UserNotFoundException;
+import com.noefer.pontoeletronicoapi.exception.WorkDayNotFoundException;
 import com.noefer.pontoeletronicoapi.model.*;
 import com.noefer.pontoeletronicoapi.model.dto.WorkDayReport;
 import com.noefer.pontoeletronicoapi.model.dto.WorkDayRequest;
@@ -36,6 +38,11 @@ public class WorkDayService {
 
     public List<WorkDayResponse> findAllByUserId(Long userId) {
         Long id = userProfileService.findUserById(userId).getId();
+
+        if (id == null) {
+            throw new UserNotFoundException("Usuário não encontrado");
+        }
+
         List<WorkDay> workDays = repository.findAllByUserId(id);
 
         return workDays.stream().map(WorkDayResponse::new).toList();
@@ -44,7 +51,7 @@ public class WorkDayService {
     public WorkDay findWorkDay(Long id) {
         Optional<WorkDay> workDayOp = repository.findById(id);
         if(workDayOp.isEmpty()) {
-            throw new RuntimeException("WorkDay not found");
+            throw new WorkDayNotFoundException("Informações da jornada de trabalho não encontradas");
         }
 
         return workDayOp.get();
@@ -53,7 +60,7 @@ public class WorkDayService {
     public WorkDayReport findWorkDayResponse(Long id) {
         Optional<WorkDay> workDayOp = repository.findById(id);
         if(workDayOp.isEmpty()) {
-            throw new RuntimeException("WorkDay not found");
+            throw new WorkDayNotFoundException("Informações da jornada de trabalho não encontradas");
         }
 
         Duration targetWorkDuration;

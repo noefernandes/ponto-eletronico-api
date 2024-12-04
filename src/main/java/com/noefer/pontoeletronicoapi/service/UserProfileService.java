@@ -1,5 +1,7 @@
 package com.noefer.pontoeletronicoapi.service;
 
+import com.noefer.pontoeletronicoapi.exception.IncorrectPasswordException;
+import com.noefer.pontoeletronicoapi.exception.UserNotFoundException;
 import com.noefer.pontoeletronicoapi.model.UserProfile;
 import com.noefer.pontoeletronicoapi.model.dto.UserProfileRequest;
 import com.noefer.pontoeletronicoapi.model.dto.UserProfileResponse;
@@ -47,11 +49,29 @@ public class UserProfileService {
     }
 
     public UserProfile findUserById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        return repository.findById(id).orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
     }
     
     public UserProfileResponse findById(Long id) {
-        UserProfile userProfile = repository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        UserProfile userProfile = repository.findById(id).orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+        return new UserProfileResponse(userProfile);
+    }
+
+    public UserProfileResponse findByUsername(String username) {
+        UserProfile userProfile = repository.findByUsername(username);
+        if(userProfile == null) throw new UserNotFoundException("Usuário não encontrado");
+        return new UserProfileResponse(userProfile);
+    }
+
+    public UserProfileResponse login(UserProfileRequest request) {
+        UserProfile userProfile = repository.findByUsername(request.getUsername());
+
+        if(userProfile == null) throw new UserNotFoundException("Usuário não encontrado");
+
+        if(!userProfile.getPassword().equals(request.getPassword())) {
+            throw new IncorrectPasswordException("Senha incorreta");
+        }
+
         return new UserProfileResponse(userProfile);
     }
 }

@@ -1,5 +1,6 @@
 package com.noefer.pontoeletronicoapi;
 
+import com.noefer.pontoeletronicoapi.exception.UserNotFoundException;
 import com.noefer.pontoeletronicoapi.model.Role;
 import com.noefer.pontoeletronicoapi.model.UserProfile;
 import com.noefer.pontoeletronicoapi.model.WorkLoad;
@@ -36,14 +37,14 @@ class UserProfileServiceTests {
     @Order(2)
     void findUser() {
         UserProfileResponse user = service.register(new UserProfileRequest("Noefer", "noefer", "123456", Role.ADMIN, WorkLoad.SIXHOURS));
-        service.findById(user.getId());
-        Assertions.assertEquals("Noefer", user.getName());
+        UserProfileResponse userResponse = service.findById(user.getId());
+        Assertions.assertEquals("Noefer", userResponse.getName());
     }
 
     @Test
     @Order(3)
     void findUserException() {
-        Assertions.assertThrowsExactly(RuntimeException.class, () -> service.findById(2L));
+        Assertions.assertThrowsExactly(UserNotFoundException.class, () -> service.findById(2L));
     }
 
     @Test
