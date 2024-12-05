@@ -28,22 +28,27 @@ public class WorkDayService {
     }
 
     @Transactional
-    public WorkDayResponse register(WorkDayRequest request) {
+    public WorkDayReport register(WorkDayRequest request) {
         WorkDay workDay = new WorkDay(request);
         UserProfile user = userProfileService.findUserById(request.getUserProfileId());
         workDay.setUser(user);
         workDay = repository.save(workDay);
-        return new WorkDayResponse(workDay);
+        return generateWorkDayReport(workDay, Duration.ofHours(user.getWorkLoad().getHours()));
     }
 
-    public List<WorkDayResponse> findAllByUserId(Long userId) {
+    public List<WorkDay> findAllByUserId(Long userId) {
         Long id = userProfileService.findUserById(userId).getId();
 
         if (id == null) {
             throw new UserNotFoundException("Usuário não encontrado");
         }
 
-        List<WorkDay> workDays = repository.findAllByUserId(id);
+        return repository.findAllByUserId(id);
+    }
+
+    public List<WorkDayResponse> findAllByUserIdResponse(Long userId) {
+
+        List<WorkDay> workDays = findAllByUserId(userId);
 
         return workDays.stream().map(WorkDayResponse::new).toList();
     }
@@ -57,8 +62,16 @@ public class WorkDayService {
         return workDayOp.get();
     }
 
-    public WorkDayReport findWorkDayResponse(Long id) {
-        Optional<WorkDay> workDayOp = repository.findById(id);
+    public WorkDayReport findWorkDayResponse(Long userId) {
+        Long id = userProfileService.findUserById(userId).getId();
+
+        List<WorkDay> workDays = this.findAllByUserId(id);
+
+        Optional<WorkDay> workDayOp = workDays.stream().filter(
+                workDay -> workDay.getTimestamp().toLocalDate().equals(LocalDateTime.now().toLocalDate()) &&
+                        workDay.getTimestamp().getYear() == LocalDateTime.now().getYear()
+        ).findFirst();
+
         if(workDayOp.isEmpty()) {
             throw new WorkDayNotFoundException("Informações da jornada de trabalho não encontradas");
         }
@@ -92,10 +105,10 @@ public class WorkDayService {
             }
         }
 
-        return getWorkDayResponse(workDay, targetWorkDuration, totalWorkTime);
+        return getWorkDayStats(workDay, targetWorkDuration, totalWorkTime);
     }
 
-    private static WorkDayReport getWorkDayResponse(WorkDay workDay, Duration targetWorkDuration, Duration totalWorkTime) {
+    private static WorkDayReport getWorkDayStats(WorkDay workDay, Duration targetWorkDuration, Duration totalWorkTime) {
         long totalWorkSeconds = totalWorkTime.getSeconds();
         long targetWorkSeconds = targetWorkDuration.getSeconds();
 

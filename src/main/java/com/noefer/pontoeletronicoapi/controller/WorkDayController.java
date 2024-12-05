@@ -1,5 +1,6 @@
 package com.noefer.pontoeletronicoapi.controller;
 
+import com.noefer.pontoeletronicoapi.model.dto.WorkDayReport;
 import com.noefer.pontoeletronicoapi.model.dto.WorkDayRequest;
 import com.noefer.pontoeletronicoapi.model.dto.WorkDayResponse;
 import com.noefer.pontoeletronicoapi.service.WorkDayService;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin("http://localhost:5173")
 @RestController
 @RequestMapping("/api/workday")
 public class WorkDayController {
@@ -18,13 +20,13 @@ public class WorkDayController {
     }
 
     @PostMapping
-    public ResponseEntity<WorkDayResponse> register(@RequestBody WorkDayRequest request) {
+    public ResponseEntity<WorkDayReport> register(@RequestBody WorkDayRequest request) {
         return ResponseEntity.ok(service.register(request));
     }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<WorkDayResponse>> findAllByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(service.findAllByUserId(userId));
+        return ResponseEntity.ok(service.findAllByUserIdResponse(userId));
     }
 
     @GetMapping("/{id}/report")
