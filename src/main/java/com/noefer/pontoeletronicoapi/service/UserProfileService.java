@@ -1,6 +1,7 @@
 package com.noefer.pontoeletronicoapi.service;
 
 import com.noefer.pontoeletronicoapi.exception.IncorrectPasswordException;
+import com.noefer.pontoeletronicoapi.exception.UserAlreadyExistsException;
 import com.noefer.pontoeletronicoapi.exception.UserNotFoundException;
 import com.noefer.pontoeletronicoapi.model.UserProfile;
 import com.noefer.pontoeletronicoapi.model.dto.UserProfileRequest;
@@ -19,14 +20,16 @@ public class UserProfileService {
         this.repository = repository;
     }
 
-    @Transactional
     public UserProfile register(UserProfile userProfile) {
         return repository.save(userProfile);
     }
 
+    @Transactional
     public UserProfileResponse register(UserProfileRequest request) {
+        UserProfile user = repository.findByUsername(request.getUsername());
+        if(user != null) throw new UserAlreadyExistsException("Usuário já cadastrado com esse nome de usuário");
         UserProfile userProfile = new UserProfile(request);
-        userProfile = repository.save(userProfile);
+        userProfile = register(userProfile);
         return new UserProfileResponse(userProfile);
     }
 

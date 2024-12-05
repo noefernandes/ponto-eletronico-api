@@ -40,4 +40,24 @@ public class GlobalExceptionHandler {
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<ErrorResponse> handleGenericRuntimeException(Exception ex) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message("Erro interno no servidor")
+                .build();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<ErrorResponse> handleGenericRuntimeException(UserAlreadyExistsException ex) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
 }
