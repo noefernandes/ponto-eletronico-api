@@ -1,16 +1,29 @@
+# Etapa de Build
 FROM ubuntu:latest AS build
 
-RUN apt-get update
-RUN apt-get install openjdk-21-jdk -y
+# Atualiza o sistema e instala dependências
+RUN apt-get update && apt-get install -y \
+    openjdk-21-jdk \
+    maven \
+    && apt-get clean
+
+# Define o diretório de trabalho
+WORKDIR /app
+
+# Copia o código-fonte para o contêiner
 COPY . .
 
-RUN apt-get install maven -y
+# Executa o build com Maven
 RUN mvn clean install
 
+# Etapa de Runtime
 FROM openjdk:21-jdk-slim
 
+# Define a porta de exposição da aplicação
 EXPOSE 8080
 
-COPY --from=build /target/deploy_render-1.0.0.jar app.jar
+# Copia o JAR gerado no estágio anterior
+COPY --from=build /app/target/*.jar app.jar
 
-ENTRYPOINT [ "java", "-jar", "app.jar" ]
+# Define o comando de inicialização
+ENTRYPOINT ["java", "-jar", "app.jar"]
