@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin({"http://localhost:5173", "https://ponto-eletronico-api.onrender.com"})
+@CrossOrigin({"http://localhost:5173", "https://ponto-eletronico-hkj3.onrender.com"})
 @RestController
 @RequestMapping("/api/workday")
 public class WorkDayController {
