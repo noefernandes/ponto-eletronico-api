@@ -27,17 +27,19 @@ Um usuário pode:
 
 Foram desenvolvidos ainda testes unitários e de integração para testar a api e o algoritmo de cálculos de tempo.
 
-Obs: Existe um delay neste provedor de alguns segundos, então pode ser necessário experar um pouco antes de logar.
-
 ## Funcionalidades futuras
 
 - Login usando spring security
 - Mudança de senha usando RabbitMQ ou Kafka
 - Acompanhamento das estatísticas em tempo real
+- Relatorios semanal, mensal, anual e desde o início
+- Desabilitar usuários
 
 ## Acesso a aplicação
 
 A aplicação pode ser acessada no seguinte link: 
 https://ponto-eletronico-hkj3.onrender.com/
+
+Obs: Existe um delay neste provedor de alguns segundos, então pode ser necessário experar um pouco antes de logar.
 
 ## Desenvolvido por Noé Fernandes
