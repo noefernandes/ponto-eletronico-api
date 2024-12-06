@@ -68,8 +68,12 @@ public class WorkDayService {
         List<WorkDay> workDays = this.findAllByUserId(id);
 
         Optional<WorkDay> workDayOp = workDays.stream().filter(
-                workDay -> workDay.getTimestamp().toLocalDate().equals(LocalDateTime.now().toLocalDate()) &&
-                        workDay.getTimestamp().getYear() == LocalDateTime.now().getYear()
+                workDay -> {
+                    System.out.println(workDay.getTimestamp().toLocalDate().toString());
+                    System.out.println(LocalDateTime.now().toLocalDate().toString());
+                    return workDay.getTimestamp().toLocalDate().equals(LocalDateTime.now().toLocalDate()) &&
+                            workDay.getTimestamp().getYear() == LocalDateTime.now().getYear();
+                }
         ).findFirst();
 
         if(workDayOp.isEmpty()) {
