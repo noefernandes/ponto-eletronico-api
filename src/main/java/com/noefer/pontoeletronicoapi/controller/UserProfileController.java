@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin("http://localhost:5173")
+@CrossOrigin("https://ponto-eletronico-hkj3.onrender.com/")
 @RestController
 @RequestMapping("/api/users")
 public class UserProfileController {
