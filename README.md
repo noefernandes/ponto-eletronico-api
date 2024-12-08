@@ -1,6 +1,6 @@
 # Aplicação de Ponto Eletrônico
 
-Desenvolvida usando Java, Spring Boot e React Js.
+Desenvolvida usando Java (21), Spring Boot (3.4.0) e React Js (18.3.1).
 
 Link frontend: https://github.com/noefernandes/ponto-eletronico
 
